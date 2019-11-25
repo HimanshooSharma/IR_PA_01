@@ -3,20 +3,21 @@ package IR.indexing;
 import Tools.RecusiveFiles;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.FSDirectory;
+
+import IR.parsing.HtmlParser;
+import IR.parsing.Parser;
+import IR.parsing.TxtParser;
 
 public class CustomIndexWriter extends IndexWriter{
 	
@@ -28,7 +29,7 @@ public class CustomIndexWriter extends IndexWriter{
 	public CustomIndexWriter(String indexDirectory, String corpusDirectory) throws IOException {
 		super(
 			FSDirectory.open(Paths.get(indexDirectory)), 
-			new IndexWriterConfig(new StandardAnalyzer())
+			new IndexWriterConfig(new EnglishAnalyzer())
 		);
 		
 		this.corpusDirectory = new File(corpusDirectory);	
@@ -36,15 +37,25 @@ public class CustomIndexWriter extends IndexWriter{
 	
 	public void createIndex() throws IOException {
 		HashSet<File> files = RecusiveFiles.getFilesfromPath(this.corpusDirectory);
+		Parser txtParser = new TxtParser();
+		Parser htmlParser = new HtmlParser();
 		for (File file : files) {
+			System.out.println(file.getCanonicalPath());
+			
 			Document document = new Document();
 
-			String path = file.getCanonicalPath();
-			System.out.println("Current File: " + file.getCanonicalPath());
-			document.add(new StringField(FIELD_FILE_PATH, path, Field.Store.YES));
-
-			Reader reader = new FileReader(file);
-			document.add(new TextField(FIELD_FILE_CONTENTS, reader));
+			ArrayList<Field> fields = null;
+			if (file.getName().endsWith(".txt")) {
+				fields = txtParser.parse(file);
+			} 
+			else if (file.getName().endsWith(".html") || file.getName().endsWith(".htm")) {
+				fields = htmlParser.parse(file);
+			}
+			else 
+				continue;
+			
+			for (Field field : fields) 
+				document.add(field);
 
 			this.addDocument(document);
 		}
