@@ -27,11 +27,13 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 
+import IR.indexing.CustomIndexWriter;
+
 public class Main {
-	public static final String PATH_TO_CORPUS = "/home/himanshoo/git/repository/IR_PA_01/Corpus";
+	public static final String PATH_TO_CORPUS = "C:\\Users\\frank\\Code\\InformationRetrieval\\IR_PA_01\\IR_PA_01\\Corpus";
 	
 	
-	public static final String PATH_TO_INDEX = "/home/himanshoo/git/repository/IR_PA_01/Index";
+	public static final String PATH_TO_INDEX = "C:\\Users\\frank\\Code\\InformationRetrieval\\IR_PA_01\\IR_PA_01\\Index";
 
 	public static final String FIELD_FILE_PATH = "path";
 	public static final String FIELD_FILE_CONTENTS = "contents";
@@ -59,12 +61,18 @@ public class Main {
 	}
 	
 	public static void main(String[] args) throws CorruptIndexException, LockObtainFailedException, IOException {
-		// TODO Auto-generated method stub
-		File dir = new File(PATH_TO_CORPUS);
-		HashSet<File> files = RecusiveFiles.getFilesfromPath(dir);
-		//System.out.println(files);
-		Main.createIndex(files);
-		System.out.println("TERMINATED");
+//		// TODO Auto-generated method stub
+//		File dir = new File(PATH_TO_CORPUS);
+//		HashSet<File> files = RecusiveFiles.getFilesfromPath(dir);
+//		//System.out.println(files);
+//		Main.createIndex(files);
+//		System.out.println("TERMINATED");
+		
+		CustomIndexWriter indexWriter = new CustomIndexWriter(PATH_TO_INDEX, PATH_TO_CORPUS);
+		indexWriter.createIndex();
+		
+		indexWriter.commit();
+		indexWriter.close();
 	}
 
 }
