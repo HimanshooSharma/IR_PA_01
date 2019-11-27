@@ -5,8 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
+import org.apache.lucene.document.StoredField;
 
 import Tools.DateFormatter;
 
@@ -17,13 +16,13 @@ public class StandardParser implements Parser {
 		ArrayList<Field> fields = new ArrayList<Field>();
 
 		String filename = file.getName();
-		fields.add(new StringField(FieldNames.KEY_FILE_NAME, filename, Field.Store.YES));
+		fields.add(new StoredField(FieldNames.KEY_FILE_NAME, filename));
 		
 		String path = file.getCanonicalPath();
-		fields.add(new StringField(FieldNames.KEY_PATH, path, Field.Store.YES));
+		fields.add(new StoredField(FieldNames.KEY_PATH, path));
 		
 		String lastModified = DateFormatter.longToString(file.lastModified());
-		fields.add(new TextField(FieldNames.KEY_LAST_MODIFIED, lastModified, Field.Store.YES));
+		fields.add(new StoredField(FieldNames.KEY_LAST_MODIFIED, lastModified));
 		
 		return fields;
 	}

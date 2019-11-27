@@ -54,27 +54,29 @@ public class InformationRetriever {
 		System.out.println("");
 	}
 	
-	public void retrieval(String queryStr) throws ParseException, IOException {
+	public String[][] retrieval(String queryStr) throws ParseException, IOException {
 		Query query = new MultiFieldQueryParser(FieldNames.QUERY_FIELD_NAMES, this.analyzer).parse(queryStr);
 		TopDocs hits = this.indexSearcher.search(query, Integer.MAX_VALUE);
 		
 		int cnt = 1;
+		String[][] retrievalResults = new String[hits.scoreDocs.length][6];
 		
 		for(ScoreDoc result : hits.scoreDocs) {
 			Document document = indexReader.document(result.doc);
 			
-			System.out.println(cnt + ". \"" + document.get(FieldNames.KEY_FILE_NAME) + "\"");
+			retrievalResults[cnt-1][0] = Integer.toString(cnt);
+			retrievalResults[cnt-1][1] = document.get(FieldNames.KEY_PATH);
+			retrievalResults[cnt-1][2] = document.get(FieldNames.KEY_LAST_MODIFIED);
+			retrievalResults[cnt-1][3] = Float.toString(result.score);
 			if (document.get(FieldNames.KEY_TITLE) != null)
-				System.out.println("Title: " + document.get(FieldNames.KEY_TITLE));
+				retrievalResults[cnt-1][4] = document.get(FieldNames.KEY_TITLE);
 			if (document.get(FieldNames.KEY_SUMMARY) != null)
-				System.out.println("Summary: " + document.get(FieldNames.KEY_SUMMARY));
-			System.out.println("Path: " + document.get(FieldNames.KEY_PATH));
-			System.out.println("Last Modifified: " + document.get(FieldNames.KEY_LAST_MODIFIED));
-			System.out.println("Relevance Score: " + result.score);
-			System.out.println("");
+				retrievalResults[cnt-1][5] = document.get(FieldNames.KEY_SUMMARY);
 			
 			cnt++;
 		}
+		
+		return retrievalResults;
 	}
 	
 }

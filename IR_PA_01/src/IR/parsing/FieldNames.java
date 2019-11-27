@@ -9,5 +9,5 @@ public class FieldNames {
 	public final static String KEY_SUMMARY = "summary";
 	public final static String KEY_LAST_MODIFIED = "lastmodified";
 	
-	public final static String[] QUERY_FIELD_NAMES = {KEY_CONTENT, KEY_TITLE, KEY_DATE, KEY_SUMMARY, KEY_LAST_MODIFIED};
+	public final static String[] QUERY_FIELD_NAMES = {KEY_CONTENT, KEY_TITLE, KEY_DATE, KEY_SUMMARY};
 }

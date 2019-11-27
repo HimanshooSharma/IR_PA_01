@@ -31,7 +31,7 @@ public class CustomIndexWriter extends IndexWriter{
 			System.out.println(file.getCanonicalPath());
 			
 			Document document = new Document();
-
+			
 			ArrayList<Field> fields = null;
 			if (file.getName().endsWith(".txt")) {
 				fields = txtParser.parse(file);

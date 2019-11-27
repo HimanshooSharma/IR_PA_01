@@ -8,21 +8,24 @@ import org.apache.commons.io.FileUtils;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 import IR.InformationRetriever;
+import dnl.utils.text.table.TextTable;
 
 public class Main {
 	
-	public static final String PATH_TO_CORPUS = "./Corpus";
-	public static final String PATH_TO_INDEX = "./Index";
+	public static final String INDEX_DIRECTORY = "./Index";
+	public static final String[] RETRIEVAL_RESULTS_COLUMNS = {"Rank", "Path", "Last Modified", "Ranking Score", "Title", "Summary"};
 	
 	public static void main(String[] args) throws IOException, ParseException {
 		
-		if (Files.notExists(Paths.get(PATH_TO_INDEX))) {
-			Files.createDirectory(Paths.get(PATH_TO_INDEX));
+		String corpusDirectory = args[0];
+		
+		if (Files.notExists(Paths.get(INDEX_DIRECTORY))) {
+			Files.createDirectory(Paths.get(INDEX_DIRECTORY));
 		}
 		
-		FileUtils.cleanDirectory(new File(PATH_TO_INDEX));
+		FileUtils.cleanDirectory(new File(INDEX_DIRECTORY));
 		
-		InformationRetriever informationRetriever = new InformationRetriever(PATH_TO_INDEX, PATH_TO_CORPUS);
+		InformationRetriever informationRetriever = new InformationRetriever(INDEX_DIRECTORY, corpusDirectory);
 		
 		try(Scanner scanner = new Scanner(System.in)) {
 			while(true) {
@@ -32,7 +35,10 @@ public class Main {
 					System.out.println("Thank you, bye!");
 					break;
 				}
-				informationRetriever.retrieval(query);
+				String[][] results = informationRetriever.retrieval(query);
+				TextTable table = new TextTable(RETRIEVAL_RESULTS_COLUMNS, results);
+				table.printTable();
+				System.out.println();
 			}
 		}
 		
