@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 
 import org.jsoup.Jsoup;
@@ -16,35 +15,27 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import Tools.DateFormatter;
-
-
-public class HtmlParser implements Parser {
+public class HtmlParser extends StandardParser {
 	
-	private ArrayList<Field> fields;
 	private Document htmlFile;
 
 	@Override
 	public ArrayList<Field> parse(File file) throws IOException {
-		this.fields = new ArrayList<Field>();
+		ArrayList<Field> fields = new ArrayList<Field>();
+		fields.addAll(super.parse(file));
+		
 		this.htmlFile = Jsoup.parse(file, "utf-8");
 		
 		try {
 			
-			String path = file.getCanonicalPath();
-			this.fields.add(new StringField(FieldNames.KEY_PATH, path, Field.Store.YES));
-			
 			String title = this.htmlFile.title();
-			this.fields.add(new TextField(FieldNames.KEY_TITLE, title, Field.Store.YES));
+			fields.add(new TextField(FieldNames.KEY_TITLE, title, Field.Store.YES));
 			
 			String body = htmlFile.body().text();
-			this.fields.add(new TextField(FieldNames.KEY_CONTENT, body, Field.Store.YES));
+			fields.add(new TextField(FieldNames.KEY_CONTENT, body, Field.Store.YES));
 			
 			String summary = htmlFile.getElementsByTag("summary").text();
-			this.fields.add(new TextField(FieldNames.KEY_SUMMARY, summary, Field.Store.YES));
-			
-			String lastModified = DateFormatter.longToString(file.lastModified());
-			this.fields.add(new TextField(FieldNames.KEY_LAST_MODIFIED, lastModified, Field.Store.YES));
+			fields.add(new TextField(FieldNames.KEY_SUMMARY, summary, Field.Store.YES));
 			
 			StringBuilder dates = new StringBuilder();
 			dates.setLength(0);
@@ -55,14 +46,14 @@ public class HtmlParser implements Parser {
                 dates.append(elem.html())
             );
             if (dates.length() > 0) 
-            	this.fields.add(new TextField(FieldNames.KEY_DATE, dates.toString(), Field.Store.YES));
+            	fields.add(new TextField(FieldNames.KEY_DATE, dates.toString(), Field.Store.YES));
 			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 			
 		
-		return this.fields;
+		return fields;
 	}
 	
 	private boolean isLastElem(Element elem, Pattern pattern) {

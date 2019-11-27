@@ -4,16 +4,14 @@ import Tools.RecusiveFiles;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.Directory;
 
 import IR.parsing.HtmlParser;
 import IR.parsing.Parser;
@@ -21,22 +19,12 @@ import IR.parsing.TxtParser;
 
 public class CustomIndexWriter extends IndexWriter{
 	
-	public static final String FIELD_FILE_PATH = "path";
-	public static final String FIELD_FILE_CONTENTS = "contents";
-	
-	private File corpusDirectory;
-
-	public CustomIndexWriter(String indexDirectory, String corpusDirectory) throws IOException {
-		super(
-			FSDirectory.open(Paths.get(indexDirectory)), 
-			new IndexWriterConfig(new EnglishAnalyzer())
-		);
-		
-		this.corpusDirectory = new File(corpusDirectory);	
+	public CustomIndexWriter(Directory index, IndexWriterConfig config) throws IOException {
+		super(index, config);
 	}
-	
-	public void createIndex() throws IOException {
-		HashSet<File> files = RecusiveFiles.getFilesfromPath(this.corpusDirectory);
+
+	public void createIndexFromCorpusDirectory(File corpusDirectory) throws IOException {
+		HashSet<File> files = RecusiveFiles.getFilesfromPath(corpusDirectory);
 		Parser txtParser = new TxtParser();
 		Parser htmlParser = new HtmlParser();
 		for (File file : files) {
@@ -59,6 +47,7 @@ public class CustomIndexWriter extends IndexWriter{
 
 			this.addDocument(document);
 		}
+		
 	}
 
 }
