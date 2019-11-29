@@ -41,13 +41,13 @@ public class InformationRetriever {
 			new IndexWriterConfig(this.analyzer)
 		);
 		
-		this.preprocessing();
+		this.preprocessingAndIndexing();
 		
 		this.indexReader = DirectoryReader.open(this.indexDirectory);
 		this.indexSearcher = new IndexSearcher(this.indexReader);
 	}
 	
-	public void preprocessing() throws IOException {
+	public void preprocessingAndIndexing() throws IOException {
 		System.out.println("Preprocess Documents and Create Index... ");
 		this.indexWriter.createIndexFromCorpusDirectory(this.corpusDirectory);
 		this.indexWriter.commit();
